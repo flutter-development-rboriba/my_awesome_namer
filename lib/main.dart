@@ -28,9 +28,20 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
+  var favorites = <WordPair>[];
 
   void getNext() {
     current = WordPair.random();
+    notifyListeners();
+  }
+
+  void toggleFavorite() {
+    if (favorites.contains(current)) {
+      favorites.remove(current);
+    } else {
+      favorites.add(current);
+    }
+    print(favorites);
     notifyListeners();
   }
 }
@@ -41,6 +52,14 @@ class MyHomePage extends StatelessWidget {
     var appState = context.watch<MyAppState>();
     var pair = appState.current;
 
+    IconData icon;
+
+    if (appState.favorites.contains(pair)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_border;
+    }
+
     return Scaffold(
       body: Center(
         child: Column(
@@ -48,15 +67,27 @@ class MyHomePage extends StatelessWidget {
           children: [
             // Text('An awesome idea:'),
             BigCard(pair: pair),
-            SizedBox(
-              height: 10,
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // print('button pressed!');
-                appState.getNext();
-              },
-              child: Text('Next'),
+            SizedBox(height: 10),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    // print('button pressed!');
+                    appState.getNext();
+                  },
+                  child: Text('Next'),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    // print('button pressed!');
+                    appState.toggleFavorite();
+                  },
+                  label: Text('Like'),
+                  icon: Icon(icon),
+                ),
+                SizedBox(width: 10)
+              ],
             )
           ],
         ),
